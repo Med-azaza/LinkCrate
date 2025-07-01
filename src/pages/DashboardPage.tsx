@@ -20,36 +20,39 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState("");
   const [links, setLinks] = useState<Link[]>([]);
+  const [linksLoading, setLinksLoading] = useState<boolean>(false);
 
   const { user, loading, signOut } = useAuth();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (user && !loading) {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
+  const fetchProfile = async () => {
+    try {
+      if (user && !loading) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
 
-          if (error) throw error;
-          setProfile(data);
-        } else {
-          setError("User not signed in.");
-        }
-      } catch (err) {
-        setError(err.message);
+        if (error) throw error;
+        setProfile(data);
+      } else {
+        setError("User not signed in.");
       }
-    };
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
+  useEffect(() => {
     const fetchLinks = async () => {
+      setLinksLoading(true);
       try {
         if (user && !loading) {
           const { data, error } = await supabase
             .from("links")
             .select("*")
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .order("order_index", { ascending: true });
 
           if (error) throw error;
           setLinks(data);
@@ -58,15 +61,26 @@ export default function DashboardPage() {
         }
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLinksLoading(false);
       }
     };
 
     fetchProfile();
     fetchLinks();
-  }, [loading, user]);
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   return (
-    <div className="p-3 h-screen flex flex-col gap-4 relative">
+    <div className="p-3 h-screen flex flex-col gap-4 relative overflow-hidden">
       {error && (
         <Alert className="absolute bottom-10 right-10 w-100 bg-red-500">
           <FontAwesomeIcon icon={faCircleExclamation} />
@@ -102,8 +116,16 @@ export default function DashboardPage() {
           </Button>
         </div>
       </Card>
-      {tab === "links" && <LinksContainer profile={profile} links={links} />}
-      {tab === "profile" && <ProfileContainer />}
+      {tab === "links" && !linksLoading && (
+        <LinksContainer profile={profile} links={links} setLinks={setLinks} />
+      )}
+      {tab === "profile" && !linksLoading && (
+        <ProfileContainer
+          profile={profile}
+          refetchProfile={fetchProfile}
+          links={links}
+        />
+      )}
     </div>
   );
 }

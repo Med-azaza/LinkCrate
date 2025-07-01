@@ -16,6 +16,7 @@ export interface Link {
   order_index: number;
   created_at: string;
   updated_at: string;
+  color: string;
 }
 
 export interface User {

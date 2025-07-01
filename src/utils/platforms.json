@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Instagram",
+    "color": "#ce1b66",
+    "icon": "fa-instagram"
+  },
+  {
+    "name": "GitHub",
+    "color": "#1A1A1A",
+    "icon": "fa-github"
+  },
+  {
+    "name": "X",
+    "color": "#333333",
+    "icon": "x-twitter"
+  },
+  {
+    "name": "LinkedIn",
+    "color": "#2D68FF",
+    "icon": "fa-linkedin"
+  },
+  {
+    "name": "YouTube",
+    "color": "#EE3939",
+    "icon": "fa-youtube"
+  },
+  {
+    "name": "Facebook",
+    "color": "#2442AC",
+    "icon": "fa-facebook"
+  },
+  {
+    "name": "Twitch",
+    "color": "#EE3FC8",
+    "icon": "fa-twitch"
+  },
+  {
+    "name": "Custom",
+    "color": "#302267",
+    "icon": "fa-link"
+  }
+]
