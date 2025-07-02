@@ -1,38 +1,35 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// utils/ProtectedRoute.tsx
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface AuthGuardProps {
+interface ProtectedRouteProps {
   children: React.ReactNode;
+  requireAuth?: boolean; // true for dashboard, false for auth pages
   redirectTo?: string;
 }
 
-export default function AuthGuard({
+const AuthGuard: React.FC<ProtectedRouteProps> = ({
   children,
-  redirectTo = "/",
-}: AuthGuardProps) {
+  requireAuth = true,
+  redirectTo,
+}) => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate(redirectTo);
-    }
-  }, [user, loading, navigate, redirectTo]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
-  if (!user) {
-    return null;
+  // For pages that require authentication (like dashboard)
+  if (requireAuth && !user) {
+    return <Navigate to="/" replace />;
+  }
+
+  // For auth pages (login/signup) - redirect if already authenticated
+  if (!requireAuth && user) {
+    return <Navigate to={redirectTo || "/dashboard"} replace />;
   }
 
   return <>{children}</>;
-}
+};
+
+export default AuthGuard;

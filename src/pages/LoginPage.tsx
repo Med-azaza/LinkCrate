@@ -1,20 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEnvelope,
-  faKey,
-  faEye,
-  faEyeSlash,
-  faCircleExclamation,
-} from "@fortawesome/free-solid-svg-icons";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -26,9 +19,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
 
-  const { signIn, user } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -41,47 +33,24 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
-    setAuthError("");
 
     try {
       const { error } = await signIn(data.email, data.password);
       if (error) {
-        setAuthError(error.message);
+        toast.error(error.message);
       } else {
         navigate("/dashboard", { replace: true });
       }
     } catch (err) {
-      setAuthError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (authError) {
-      const timer = setTimeout(() => {
-        setAuthError("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [authError]);
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
-
   return (
     <div className="flex items-center justify-center h-screen flex-col relative">
-      {authError && (
-        <Alert className="absolute bottom-10 right-10 w-100 bg-red-500">
-          <FontAwesomeIcon icon={faCircleExclamation} />
-          <AlertTitle>Something went wrong!</AlertTitle>
-          <AlertDescription>{authError}</AlertDescription>
-        </Alert>
-      )}
       <div className="flex items-center justify-center">
         <img src="logo-brand.png" alt="" height={120} width={120} />
         <h1 className="text-5xl font-semibold">LinkCrate</h1>
@@ -99,7 +68,10 @@ export default function LoginPage() {
               errors.email ? "border-red-500" : "border-black"
             }`}
           >
-            <FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />
+            <FontAwesomeIcon
+              icon={["fas", "envelope"]}
+              className="text-gray-400"
+            />
             <input
               type="email"
               className="flex-1 outline-0"
@@ -114,7 +86,7 @@ export default function LoginPage() {
               errors.password ? "border-red-500" : "border-black"
             }`}
           >
-            <FontAwesomeIcon icon={faKey} className="text-gray-400" />
+            <FontAwesomeIcon icon={["fas", "key"]} className="text-gray-400" />
             <input
               className="flex-1 outline-0"
               placeholder="Enter your password"
@@ -129,9 +101,15 @@ export default function LoginPage() {
               className="cursor-pointer"
             >
               {!showPassword ? (
-                <FontAwesomeIcon icon={faEye} className="text-gray-400" />
+                <FontAwesomeIcon
+                  icon={["fas", "eye"]}
+                  className="text-gray-400"
+                />
               ) : (
-                <FontAwesomeIcon icon={faEyeSlash} className="text-gray-400" />
+                <FontAwesomeIcon
+                  icon={["fas", "eye-slash"]}
+                  className="text-gray-400"
+                />
               )}
             </button>
           </div>

@@ -15,9 +15,10 @@ import platforms from "../utils/platforms.json";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as z from "zod/v4";
+import LivePreview from "./LivePreview";
+import { toast } from "sonner";
 
 type EditableLink = Link & {
   isNew: boolean;
@@ -54,19 +55,12 @@ const linkSchema = z.object({
 const linksSchema = z.array(linkSchema);
 
 export default function LinksContainer({ profile, links, setLinks }: Props) {
-  const [editableLinks, setEditableLinks] = useState<EditableLink[] | Link[]>(
-    links
+  const [editableLinks, setEditableLinks] = useState<EditableLink[]>(
+    links.map((link) => ({ ...link, isNew: false }))
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const { user } = useAuth();
-
-  let skeletonLinks = null;
-
-  if (links.length < 5) {
-    skeletonLinks = new Array(5 - links.length).fill("");
-  }
 
   const colorMap = new Map(
     platforms.map((p) => [p.name.toLowerCase(), p.color])
@@ -118,10 +112,6 @@ export default function LinksContainer({ profile, links, setLinks }: Props) {
         .filter((link) => link.id !== id)
         .map((link, index) => ({ ...link, order_index: index + 1 }))
     );
-  };
-
-  const handleReorderLinks = (reorderedLinks) => {
-    setEditableLinks(reorderedLinks);
   };
 
   const handleSave = async () => {
@@ -193,101 +183,26 @@ export default function LinksContainer({ profile, links, setLinks }: Props) {
         // Update originalLinks to match editableLinks
         setLinks([...editableLinks]);
       }
+      toast.success("Links updated successfully!");
     } catch (err) {
       if (err instanceof z.ZodError) {
-        setError("invalid links");
+        toast.error("invalid links");
       } else {
-        setError(err.message);
+        toast.error(err.message);
       }
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
-  function getIconByName(name: string): string | undefined {
-    const item = platforms.find((item) => item.name === name);
-    return item?.icon;
-  }
-
   return (
     <div className="flex items-center justify-center gap-4 flex-1 relative ">
-      {error && (
-        <Alert className="absolute bottom-10 left-10 w-100 bg-red-500">
-          <FontAwesomeIcon icon={faCircleExclamation} />
-          <AlertTitle>Something went wrong!</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
       {loading && (
         <div className="absolute inset-0 bg-black/40 z-50 flex items-center justify-center">
           loading...
         </div>
       )}
-      <Card className="flex-2/6 h-full bg-white flex items-center justify-center">
-        <div className="w-70 h-143 relative py-8 px-3">
-          <div className="flex flex-col items-center z-2 absolute inset-y-10 inset-x-3 gap-4 px-4 overflow-auto">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} />
-            ) : (
-              <div className="h-20 w-20 rounded-full bg-gray-200 shrink-0"></div>
-            )}
-            {profile?.first_name ? (
-              <span>
-                {profile.first_name} {profile.last_name}
-              </span>
-            ) : (
-              <div className="h-4 w-40 rounded-full bg-gray-200 shrink-0"></div>
-            )}
-            {profile?.email ? (
-              <span className="text-xs text-gray-500">{profile.email}</span>
-            ) : (
-              <div className="h-2 w-20 rounded-full bg-gray-200 shrink-0"></div>
-            )}
-            {links &&
-              links.map((link) => (
-                <div
-                  className="w-full py-1.5 px-3 rounded text-white flex items-center justify-between"
-                  style={{ backgroundColor: link.color }}
-                  key={link.id}
-                >
-                  <div>
-                    {link.platform !== "Custom" ? (
-                      <FontAwesomeIcon
-                        icon={["fab", getIconByName(link.platform)]}
-                      />
-                    ) : (
-                      <FontAwesomeIcon icon="fa-link" />
-                    )}
-                    <span className="text-white text-xs font-light ml-2">
-                      {link.platform}
-                    </span>
-                  </div>
-                  <FontAwesomeIcon className="text-xs" icon="fa-arrow-right" />
-                </div>
-              ))}
-            {skeletonLinks?.map((item, index) => (
-              <div
-                key={index}
-                className="w-full py-1.5 px-3 rounded bg-gray-200 h-8"
-              ></div>
-            ))}
-          </div>
-          <img
-            className="absolute z-1 top-0 right-0"
-            src="/phone-frame.svg"
-            alt=""
-          />
-        </div>
-      </Card>
+      <LivePreview profile={profile} links={links} />
 
       <Card className="flex-2/3 h-full bg-white px-6 flex">
         <h1 className="text-2xl">Customize your links</h1>
