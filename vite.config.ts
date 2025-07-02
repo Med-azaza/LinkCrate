@@ -16,6 +16,7 @@ export default defineConfig({
     rollupOptions: {
       onwarn: () => {}, // Suppress warnings
     },
+    outDir: "dist",
   },
   esbuild: {
     // Ignore TypeScript errors during build
