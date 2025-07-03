@@ -29,14 +29,12 @@ export default function DashboardPage() {
     try {
       const qrDataUrl = await QRCode.toDataURL(text, {
         width: 256,
-        height: 256,
         margin: 2,
         color: {
           dark: "#000000",
           light: "#FFFFFF",
         },
         errorCorrectionLevel: "M",
-        type: "image/png",
       });
       return qrDataUrl;
     } catch (error) {
@@ -60,7 +58,7 @@ export default function DashboardPage() {
         toast.error("User not signed in.");
       }
     } catch (err) {
-      toast.error(err.message);
+      toast.error((err as Error).message);
     }
   };
 
@@ -129,7 +127,7 @@ export default function DashboardPage() {
           toast.error("User not signed in.");
         }
       } catch (err) {
-        toast.error(err.message);
+        toast.error((err as Error).message);
       } finally {
         setLinksLoading(false);
       }

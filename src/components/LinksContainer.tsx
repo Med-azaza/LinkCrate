@@ -1,13 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "./ui/card";
 import type { Profile, Link } from "@/types";
 import { Button } from "./ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faCircleExclamation,
-  type IconName,
-} from "@fortawesome/free-solid-svg-icons";
+import { type IconName } from "@fortawesome/free-solid-svg-icons";
 import {
   Select,
   SelectContent,
@@ -112,11 +108,15 @@ export default function LinksContainer({
         platform: "",
         order_index: editableLinks.length + 1,
         isNew: true,
+        user_id: user?.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        color: "",
       },
     ]);
   };
 
-  const handleRemoveLink = (id) => {
+  const handleRemoveLink = (id: string) => {
     setEditableLinks(
       editableLinks
         .filter((link) => link.id !== id)
@@ -198,7 +198,7 @@ export default function LinksContainer({
       if (err instanceof z.ZodError) {
         toast.error("invalid links");
       } else {
-        toast.error(err.message);
+        toast.error((err as Error).message);
       }
     } finally {
       setLoading(false);
@@ -225,7 +225,7 @@ export default function LinksContainer({
           world!
         </p>
         <Button onClick={handleAddLink} className="cursor-pointer bg-white">
-          <FontAwesomeIcon icon={faPlus} /> Add new link
+          <FontAwesomeIcon icon={["fas", "plus"]} /> Add new link
         </Button>
         <ScrollArea className="flex-1 basis-0 border-b border-gray-300">
           {editableLinks.map((link) => (

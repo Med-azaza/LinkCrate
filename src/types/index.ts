@@ -11,7 +11,7 @@ export interface Profile {
 
 export interface Link {
   id: string;
-  user_id: string;
+  user_id?: string;
   url: string;
   platform: string;
   order_index: number;
