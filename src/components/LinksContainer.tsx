@@ -133,12 +133,12 @@ export default function LinksContainer({
           ...link,
           url: link.url.startsWith("http") ? link.url : `https://${link.url}`,
         }));
-        setEditableLinks(validLinks);
+        await setEditableLinks(validLinks);
         await linksSchema.parse(validLinks);
 
-        const newLinks = editableLinks.filter((link) => link.isNew);
+        const newLinks = validLinks.filter((link) => link.isNew);
 
-        const updatedLinks = editableLinks.filter(
+        const updatedLinks = validLinks.filter(
           (link) =>
             !link.isNew &&
             links.some(
