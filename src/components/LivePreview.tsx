@@ -7,9 +7,10 @@ import type { IconName } from "@fortawesome/fontawesome-svg-core";
 type Props = {
   profile: Profile | null;
   links: Link[];
+  show: boolean;
 };
 
-export default function LivePreview({ profile, links }: Props) {
+export default function LivePreview({ profile, links, show }: Props) {
   let skeletonLinks = null;
 
   if (links.length < 5) {
@@ -22,12 +23,16 @@ export default function LivePreview({ profile, links }: Props) {
   }
 
   return (
-    <Card className="flex-2/6 h-full bg-white flex items-center justify-center">
+    <Card
+      className={`flex-2/6 h-full bg-white items-center justify-center ${
+        !show ? "hidden" : ""
+      } lg:flex`}
+    >
       <div className="w-70 h-143 relative py-8 px-3">
         <div className="flex flex-col items-center z-2 absolute inset-y-10 inset-x-3 gap-4 px-4 overflow-auto">
           {profile?.avatar_url ? (
             <img
-              className="size-20 rounded-full shrink-0 object-cover"
+              className="size-20 rounded-full shrink-0 object-cover border-3 p-0.5"
               src={profile.avatar_url}
             />
           ) : (

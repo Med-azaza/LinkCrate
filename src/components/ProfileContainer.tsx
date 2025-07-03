@@ -13,12 +13,14 @@ type Props = {
   profile: Profile | null;
   links: Link[];
   refetchProfile: () => Promise<void>;
+  previewShow: boolean;
 };
 
 export default function ProfileContainer({
   profile,
   links,
   refetchProfile,
+  previewShow,
 }: Props) {
   const [firstName, setFirstName] = useState(profile?.first_name || "");
   const [lastName, setLastName] = useState(profile?.last_name || "");
@@ -157,33 +159,38 @@ export default function ProfileContainer({
           loading...
         </div>
       )}
-      <LivePreview profile={profile} links={links} />
-      <form onSubmit={handleSubmit} className="flex-2/3 h-full">
-        <Card className="flex-2/3 h-full bg-white px-6 flex">
+      <LivePreview show={previewShow} profile={profile} links={links} />
+      <form
+        onSubmit={handleSubmit}
+        className={`flex-2/3 h-full ${previewShow ? "hidden" : ""} lg:block`}
+      >
+        <Card
+          className={`flex-2/3 h-full bg-white px-6 flex gap-2 sm:gap-4 md:gap-6`}
+        >
           <h1 className="text-2xl">Profile Details</h1>
           <p className="text-gray-500">
             Add your details to create a personal touch to your profile.
           </p>
           <div className="flex-1 flex flex-col gap-2">
-            <Card className="flex-1 bg-white flex items-center justify-around flex-row ">
-              <p className="text-gray-500">Profile picture</p>
+            <Card className="sm:flex-1 bg-white flex items-center justify-between sm:justify-around flex-row px-3 sm:px-0 gap-2 sm:gap-4 md:gap-6">
+              <p className="hidden sm:block text-gray-500">Profile picture</p>
               <Card
                 onClick={triggerFileInput}
-                className="size-50 p-0 cursor-pointer flex items-center justify-center text-fuchsia-500 relative "
+                className=" p-0 cursor-pointer flex items-center justify-center text-fuchsia-500 relative size-35 lg:size-40 xl:size-45 2xl:size-50"
               >
                 {avatarPreview ? (
                   <>
                     <img
                       src={avatarPreview}
                       alt="Profile"
-                      className="size-full object-cover"
+                      className="object-cover size-full"
                     />
                     <div className="absolute text-white bg-black/30 inset-0 flex items-center justify-center flex-col gap-4">
                       <FontAwesomeIcon
-                        className="text-5xl"
+                        className="text-2xl md:text-3xl lg:text-5xl"
                         icon={["fas", "image"]}
                       />
-                      <span>Change Image</span>
+                      <span className="sm:text-md text-sm">Change Image</span>
                     </div>
                   </>
                 ) : (
@@ -203,44 +210,46 @@ export default function ProfileContainer({
                   className="hidden"
                 />
               </Card>
-              <p className="text-gray-500">Image must be below 30MB</p>
+              <p className="sm:text-md text-sm text-gray-500">
+                Image must be below 30MB
+              </p>
             </Card>
-            <Card className="flex-1 bg-white px-4 flex justify-center">
-              <div className="flex items-center justify-between">
+            <Card className="flex-1 bg-white px-4 flex justify-center gap-2 xl:gap-6 lg:gap-4">
+              <div className="flex sm:items-center justify-between sm:flex-row flex-col items-start">
                 <span>First name*</span>
                 <Input
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-1/2"
+                  className="sm:w-1/2 w-full"
                   type="text"
                   placeholder="e.g. John"
                   required
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex sm:items-center justify-between sm:flex-row flex-col items-start">
                 <span>Last name*</span>
                 <Input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-1/2"
+                  className="sm:w-1/2 w-full"
                   type="text"
                   placeholder="e.g. Doe"
                   required
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex sm:items-center justify-between sm:flex-row flex-col items-start">
                 <span>Email</span>
                 <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-1/2"
+                  className="sm:w-1/2 w-full"
                   type="email"
                   placeholder="e.g. email@example.com"
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex sm:items-center justify-between sm:flex-row flex-col items-start">
                 <span>Code</span>
-                <div className="w-1/2 flex items-center justify-end gap-2">
+                <div className="sm:w-1/2 w-full flex items-center justify-end gap-2">
                   <span className="text-gray-400">link-crate.com/</span>
                   <Input
                     value={code}

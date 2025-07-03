@@ -3,7 +3,11 @@ import { Card } from "./ui/card";
 import type { Profile, Link } from "@/types";
 import { Button } from "./ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faCircleExclamation,
+  type IconName,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   Select,
   SelectContent,
@@ -27,6 +31,7 @@ type Props = {
   profile: Profile | null;
   links: Link[];
   setLinks: React.Dispatch<React.SetStateAction<Link[]>>;
+  previewShow: boolean;
 };
 
 const linkSchema = z.object({
@@ -54,7 +59,12 @@ const linkSchema = z.object({
 
 const linksSchema = z.array(linkSchema);
 
-export default function LinksContainer({ profile, links, setLinks }: Props) {
+export default function LinksContainer({
+  profile,
+  links,
+  setLinks,
+  previewShow,
+}: Props) {
   const [editableLinks, setEditableLinks] = useState<EditableLink[]>(
     links.map((link) => ({ ...link, isNew: false }))
   );
@@ -202,9 +212,13 @@ export default function LinksContainer({ profile, links, setLinks }: Props) {
           loading...
         </div>
       )}
-      <LivePreview profile={profile} links={links} />
+      <LivePreview show={previewShow} profile={profile} links={links} />
 
-      <Card className="flex-2/3 h-full bg-white px-6 flex">
+      <Card
+        className={`flex-2/3 h-full bg-white px-6 ${
+          previewShow ? "hidden" : ""
+        } lg:flex`}
+      >
         <h1 className="text-2xl">Customize your links</h1>
         <p className="text-gray-500">
           Add/edit/remove links below and then share all your profiles with the
@@ -243,9 +257,11 @@ export default function LinksContainer({ profile, links, setLinks }: Props) {
                     <SelectItem key={platform.name} value={platform.name}>
                       <>
                         {platform.name !== "Custom" ? (
-                          <FontAwesomeIcon icon={["fab", platform.icon]} />
+                          <FontAwesomeIcon
+                            icon={["fab", platform.icon as IconName]}
+                          />
                         ) : (
-                          <FontAwesomeIcon icon="fa-link" />
+                          <FontAwesomeIcon icon={["fas", "link"]} />
                         )}
 
                         {platform.name}
@@ -256,7 +272,7 @@ export default function LinksContainer({ profile, links, setLinks }: Props) {
               </Select>
               <span className="text-sm">Link</span>
               <div className="border-2 rounded-md p-2 flex items-center justify-center gap-2">
-                <FontAwesomeIcon icon="fa-link" />
+                <FontAwesomeIcon icon={["fas", "link"]} />
                 <input
                   type="url"
                   placeholder="e.g. https://www.linkedin.com/johndoe"

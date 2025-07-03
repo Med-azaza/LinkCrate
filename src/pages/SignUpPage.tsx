@@ -79,12 +79,18 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen flex-col relative">
+    <div className="flex items-center justify-center h-screen flex-col relative px-3 sm:px-0">
       <div className="flex items-center justify-center">
-        <img src="logo-brand.png" alt="" height={120} width={120} />
-        <h1 className="text-5xl font-semibold">LinkCrate</h1>
+        <img
+          src="logo-brand.png"
+          alt=""
+          className="size-20 sm:size-25 md:size-30"
+        />
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-semibold">
+          LinkCrate
+        </h1>
       </div>
-      <Card className="bg-white p-8 min-w-120">
+      <Card className="bg-white p-8 w-full gap-2 sm:gap-4 md:gap-6 sm:w-120">
         <p className="font-bold text-xl">Create account</p>
         <span className="text-gray-500">
           Let's get your link hub live in seconds!

@@ -4,17 +4,12 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LinksContainer from "@/components/LinksContainer";
 import ProfileContainer from "@/components/ProfileContainer";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Profile, Link } from "@/types";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import QRCode from "qrcode";
-
-interface QRCodeShareProps {
-  url: string;
-  title?: string;
-}
 
 export default function DashboardPage() {
   const [tab, setTab] = useState<"links" | "profile">("links");
@@ -23,9 +18,10 @@ export default function DashboardPage() {
   const [linksLoading, setLinksLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [showQR, setShowQR] = useState<boolean>(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // preview for mobile
+  const [previewShow, setPreviewShow] = useState(false);
 
   const { user, loading, signOut } = useAuth();
 
@@ -46,23 +42,6 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Error generating QR code:", error);
       throw error;
-    }
-  };
-
-  const handleGenerateQR = async () => {
-    setIsGenerating(true);
-
-    try {
-      const qrDataUrl = await generateQRCode(
-        `${window.location.origin}/${profile?.code}`
-      );
-      setQrCodeDataUrl(qrDataUrl);
-      setShowQR(true);
-    } catch (error) {
-      console.error("Error generating QR code:", error);
-      toast.error("Failed to generate QR code. Please try again.");
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -161,36 +140,64 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    const handleGenerateQR = async () => {
+      try {
+        const qrDataUrl = await generateQRCode(
+          `${window.location.origin}/${profile?.code}`
+        );
+        setQrCodeDataUrl(qrDataUrl);
+        setShowQR(true);
+      } catch (error) {
+        console.error("Error generating QR code:", error);
+        toast.error("Failed to generate QR code. Please try again.");
+      }
+    };
     handleGenerateQR();
   }, [profile]);
 
   return (
     <div className="p-3 h-screen flex flex-col gap-4 relative overflow-hidden">
-      <Card className="bg-white flex items-center justify-between flex-row px-4 py-2">
+      <Card className="bg-white flex items-center justify-between flex-row px-2 sm:px-4 py-2 gap-2 sm:gap-6">
         <div className="flex items-center justify-center">
           <img src="logo-brand.png" alt="" height={60} width={60} />
-          <h1 className="text-2xl font-semibold">LinkCrate</h1>
+          <h1 className="text-2xl font-semibold hidden md:block">LinkCrate</h1>
         </div>
-        <div className="gap-4 flex">
+        <div className="gap-2 sm:gap-4 flex">
           <Button
             onClick={() => setTab("links")}
-            className="cursor-pointer bg-white"
+            className={`cursor-pointer bg-white ${
+              tab === "links" && "text-fuchsia-500"
+            }`}
           >
             <FontAwesomeIcon icon={["fas", "link"]} />
-            Links
+            <span className="hidden sm:block">Links</span>
           </Button>
           <Button
             onClick={() => setTab("profile")}
-            className="cursor-pointer bg-white"
+            className={`cursor-pointer bg-white ${
+              tab === "profile" && "text-fuchsia-500"
+            }`}
           >
             <FontAwesomeIcon icon={["fas", "user"]} />
-            Profile Details
+            <span className="hidden sm:block">Profile Details</span>
           </Button>
         </div>
-        <div className="gap-4 flex">
+        <div className="gap-2 sm:gap-4 flex">
+          <Button
+            onClick={() => setPreviewShow(!previewShow)}
+            className={`lg:hidden ${!previewShow ? "bg-white" : ""}`}
+          >
+            <FontAwesomeIcon icon={["fas", "eye"]} />
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="cursor-pointer">Share</Button>
+              <Button className="cursor-pointer">
+                <span className="hidden sm:block">Share</span>
+                <FontAwesomeIcon
+                  className=" block sm:hidden"
+                  icon={["fas", "share"]}
+                />
+              </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <div className=" flex items-center justify-center flex-col gap-3">
@@ -230,13 +237,19 @@ export default function DashboardPage() {
         </div>
       </Card>
       {tab === "links" && !linksLoading && (
-        <LinksContainer profile={profile} links={links} setLinks={setLinks} />
+        <LinksContainer
+          profile={profile}
+          links={links}
+          setLinks={setLinks}
+          previewShow={previewShow}
+        />
       )}
       {tab === "profile" && !linksLoading && (
         <ProfileContainer
           profile={profile}
           refetchProfile={fetchProfile}
           links={links}
+          previewShow={previewShow}
         />
       )}
     </div>

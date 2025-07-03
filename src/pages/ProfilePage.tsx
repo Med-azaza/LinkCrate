@@ -72,7 +72,7 @@ export default function ProfilePage() {
 
   if (!profile)
     return (
-      <div className="h-screen flex items-center justify-center flex-col">
+      <div className="h-screen flex items-center justify-center flex-col sm:px-0 px-4">
         <Link to="/" className="flex items-center justify-center">
           <img src="logo-brand.png" alt="" height={120} width={120} />
           <h1 className="text-5xl font-semibold">LinkCrate</h1>
@@ -99,7 +99,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center flex-col">
+    <div className="h-screen flex items-center justify-center flex-col sm:px-0 px-4">
       <Link to="/" className="flex items-center justify-center">
         <img src="logo-brand.png" alt="" height={120} width={120} />
         <h1 className="text-5xl font-semibold">LinkCrate</h1>
@@ -107,7 +107,7 @@ export default function ProfilePage() {
       <Card className="px-8 bg-white min-w-90 h-3/4 flex items-center justify-start overflow-auto">
         {profile.avatar_url ? (
           <img
-            className="size-30 object-cover rounded-full "
+            className="size-30 object-cover rounded-full border-4 p-0.5"
             src={profile.avatar_url}
           />
         ) : (
