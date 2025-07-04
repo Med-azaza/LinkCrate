@@ -12,7 +12,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen ">
+        <div className="min-h-screen">
           <Toaster />
           <Routes>
             <Route

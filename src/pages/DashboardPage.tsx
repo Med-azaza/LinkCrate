@@ -154,7 +154,7 @@ export default function DashboardPage() {
   }, [profile]);
 
   return (
-    <div className="p-3 h-screen flex flex-col gap-4 relative overflow-hidden">
+    <div className="p-3 h-screen flex flex-col gap-4 relative overflow-auto">
       <Card className="bg-white flex items-center justify-between flex-row px-2 sm:px-4 py-2 gap-2 sm:gap-6">
         <div className="flex items-center justify-center">
           <img src="logo-brand.png" alt="" height={60} width={60} />
